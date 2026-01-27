@@ -12,7 +12,7 @@ Follow these steps to get WireTapper up and running:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/WireTapper.git
+   git clone https://github.com/h9zdev/WireTapper.git
    cd WireTapper
    ```
 
