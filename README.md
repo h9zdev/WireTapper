@@ -36,7 +36,7 @@ Follow these steps to get WireTapper up and running:
    ```bash
    python app.py
    ```
-   The application will be available at `http://localhost:8080`.
+   After running the app, open in your browser: `https://127.0.0.1:8000/map-w`
 
 ## 📶 Supported Signal Intelligence
 
