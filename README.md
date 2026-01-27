@@ -6,6 +6,23 @@ WireTapper is a wireless OSINT tool designed to discover, map, and analyze radio
 
 WireTapper detects and correlates signals from common wireless technologies, helping users understand what devices exist, where they are likely located, and how they interact, without active intrusion.
 
+🔗 **Website:** https://haybnz.web.app/
+🔗 **Blog on WireTapper:** https://haybnz.web.app/
+
+
+## 📶 Supported Signal Intelligence
+
+WireTapper can identify and analyze signals from:
+
+*   **Wi-Fi** access points & clients
+*   **Bluetooth & BLE** devices
+*   **Wireless CCTV / IP cameras**
+*   **Vehicles** broadcasting RF signals (infotainment, telemetry, keyless systems)
+*   **Headphones, wearables**, and smart devices
+*   **Smart TVs & IoT** appliances
+*   **Cell towers** & mobile network beacons
+
+
 ## 🚀 Installation
 
 Follow these steps to get WireTapper up and running:
@@ -38,14 +55,27 @@ Follow these steps to get WireTapper up and running:
    ```
    The application will be available at `http://localhost:8080`.
 
-## 📶 Supported Signal Intelligence
+## 📷 Screenshots
 
-WireTapper can identify and analyze signals from:
+![WireTapper Image 1](https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/Wiretapper11.png)  
+![WireTapper Image 2](https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/Wiretapper34.png)  
+![WireTapper Image 3](https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/Wiretapper354.png)  
+![WireTapper Image 4](https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/Wiretapper55.png)  
+![WireTapper Image 5](https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/Wiretapper568.png)
 
-*   **Wi-Fi** access points & clients
-*   **Bluetooth & BLE** devices
-*   **Wireless CCTV / IP cameras**
-*   **Vehicles** broadcasting RF signals (infotainment, telemetry, keyless systems)
-*   **Headphones, wearables**, and smart devices
-*   **Smart TVs & IoT** appliances
-*   **Cell towers** & mobile network beacons
+
+## 📜 License
+
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License. See the [LICENSE](LICENSE) file for more details.
+
+**Unauthorized use is strictly prohibited.**
+
+📧 Contact: singularat@protn.me
+
+## ☕ Support
+
+Donate via Monero: `45PU6txuLxtFFcVP95qT2xXdg7eZzPsqFfbtZp5HTjLbPquDAugBKNSh1bJ76qmAWNGMBCKk4R1UCYqXxYwYfP2wTggZNhq`
+
+## 👥 Contributors and Developers
+
+[<img src="https://avatars.githubusercontent.com/u/67865621?s=64&v=4" width="64" height="64" alt="haybnzz">](https://github.com/h9zdev)  
