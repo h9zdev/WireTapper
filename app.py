@@ -1,20 +1,16 @@
 import random
 import requests
 import ssl
+import os
 from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-
-
-## Hardcoded API credentials
-
-
-## Hardcoded API credentials
-WIGLE_API_NAME = ""
-WIGLE_API_TOKEN = ""
-OPENCELLID_API_KEY = ""
-SHODAN_API_KEY = ""
+## API credentials (recommend setting these via environment variables)
+WIGLE_API_NAME = os.environ.get("WIGLE_API_NAME", "")
+WIGLE_API_TOKEN = os.environ.get("WIGLE_API_TOKEN", "")
+OPENCELLID_API_KEY = os.environ.get("OPENCELLID_API_KEY", "")
+SHODAN_API_KEY = os.environ.get("SHODAN_API_KEY", "")
 
 
 # Dummy data for testing
