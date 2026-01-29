@@ -1,7 +1,11 @@
 # 📡 WireTapper
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/h9zdev/WireTapper/main/images/WireTapper.png" alt="WireTapper" />
+</p>
 
-**Wireless OSINT & Signal Intelligence Platform**
+> [!NOTE]
+> **Wireless OSINT & Signal Intelligence Platform**
 
 WireTapper is a wireless OSINT tool designed to discover, map, and analyze radio-based devices using passive signal intelligence. It provides investigators, researchers, and security analysts with real-time visibility into the invisible wireless landscape around them.
 
@@ -24,7 +28,20 @@ WireTapper detects and correlates signals from common wireless technologies, hel
     <img src="https://img.shields.io/badge/Make%20a%20Difference-Support%20My%20Work-6A1B9A?style=for-the-badge&logo=github&logoColor=white" alt="Support My Work" />
   </a>
 </p>
-
+<p align="center">
+  <a href="https://github.com/h9zdev/WireTapper">
+    <img src="https://img.shields.io/static/v1?label=Python&message=WireTapper&color=2A3E87&labelColor=6A7DA8&style=for-the-badge&logo=python&logoColor=white" />
+  </a>
+  <a href="https://github.com/h9zdev/WireTapper/issues">
+    <img src="https://img.shields.io/github/issues/h9zdev/WireTapper?style=for-the-badge&color=8B0000&logo=github" />
+  </a>
+  <a href="https://github.com/h9zdev/WireTapper/network/members">
+    <img src="https://img.shields.io/github/forks/h9zdev/WireTapper?style=for-the-badge&color=455A64&logo=github" />
+  </a>
+  <a href="https://github.com/h9zdev/WireTapper/stargazers">
+    <img src="https://img.shields.io/github/stars/h9zdev/WireTapper?style=for-the-badge&color=FFD700&logo=github" />
+  </a>
+</p>
 
 ## 📶 Supported Signal Intelligence
 
