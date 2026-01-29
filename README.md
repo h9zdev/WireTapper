@@ -23,6 +23,16 @@ WireTapper can identify and analyze signals from:
 *   **Cell towers** & mobile network beacons
 
 
+## 🔑 API Services
+
+WireTapper integrates with several external services to provide intelligence. You will need to obtain API keys from the following:
+
+*   **[Wigle.net](https://wigle.net/)** – Wireless network mapping and discovery.
+*   **[OpenCellID](https://opencellid.org/)** – Open-source database of cell towers.
+*   **[Shodan](https://www.shodan.io/)** – Search engine for Internet-connected devices.
+    *   **Note:** A **Premium account** is required to use Shodan's API with this tool.
+
+
 ## 🚀 Installation
 
 Follow these steps to get WireTapper up and running:
