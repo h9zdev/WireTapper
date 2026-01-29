@@ -25,7 +25,7 @@ WireTapper detects and correlates signals from common wireless technologies, hel
 
 <p align="center">
   <a href="https://github.com/sponsors/h9zdev">
-    <img src="https://img.shields.io/badge/Make%20a%20Difference-Support%20My%20Work-6A1B9A?style=for-the-badge&logo=github&logoColor=white" alt="Support My Work" />
+    <img src="https://img.shields.io/badge/Make%20a%20Difference-Sponser%20My%20Work-6A1B9A?style=for-the-badge&logo=github&logoColor=white" alt="Support My Work" />
   </a>
 </p>
 <p align="center">
