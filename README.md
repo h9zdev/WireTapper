@@ -1,13 +1,29 @@
 # 📡 WireTapper
 
+
 **Wireless OSINT & Signal Intelligence Platform**
 
 WireTapper is a wireless OSINT tool designed to discover, map, and analyze radio-based devices using passive signal intelligence. It provides investigators, researchers, and security analysts with real-time visibility into the invisible wireless landscape around them.
 
 WireTapper detects and correlates signals from common wireless technologies, helping users understand what devices exist, where they are likely located, and how they interact, without active intrusion.
 
-🔗 **Website:** https://haybnz.web.app?utm_source=github.com
-🔗 **Blog on WireTapper:** [https://haybnz.web.app/](https://medium.com/@h9z/wire-tapper-wireless-osint-signal-intelligence-platform-e5104659a1cb?utm_source=github.com)
+<p align="center">
+  🔗 <strong>Website:</strong>
+  <a href="https://haybnz.web.app?utm_source=github.com">https://haybnz.web.app</a>
+</p>
+
+<p align="center">
+  🔗 <strong>Blog on WireTapper:</strong>
+  <a href="https://medium.com/@h9z/wire-tapper-wireless-osint-signal-intelligence-platform-e5104659a1cb?utm_source=github.com">
+    Read on Medium
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sponsors/h9zdev">
+    <img src="https://img.shields.io/badge/Make%20a%20Difference-Support%20My%20Work-6A1B9A?style=for-the-badge&logo=github&logoColor=white" alt="Support My Work" />
+  </a>
+</p>
 
 
 ## 📶 Supported Signal Intelligence
