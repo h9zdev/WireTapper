@@ -1,0 +1,4 @@
+Flask>=3.0.0
+requests>=2.31.0
+pytest>=8.0.0
+playwright>=1.40.0

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+flask.log
+.venv/
+verification/
+.pytest_cache/
+node_modules/

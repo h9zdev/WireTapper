@@ -619,8 +619,9 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: var(--danger);
-            color: #fff;
+            background: rgba(2, 20, 20, 0.9);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
             padding: 15px 30px;
             border-radius: 4px;
             display: none;
@@ -628,7 +629,7 @@
             font-weight: bold;
             font-size: 12px;
             z-index: 2000;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
+            box-shadow: var(--neon-glow);
         }
 
         /* ---------- Custom Leaflet Popup ---------- */
@@ -817,7 +818,6 @@
             font-size: 24px;
             margin-bottom: 8px;
             color: var(--primary-color);
-            /* Changed from yellow */
         }
 
         .app-item span {
@@ -840,7 +840,6 @@
         #coords {
             font-size: 13px;
             color: var(--primary-color);
-            /* Changed from yellow */
             margin-bottom: 12px;
         }
 
@@ -859,7 +858,6 @@
             border: 2px solid var(--border-color);
             border-radius: 4px;
             color: var(--primary-color);
-            /* Changed from yellow */
         }
 
         .device {
@@ -875,7 +873,6 @@
             cursor: pointer;
             font-size: 18px;
             color: var(--primary-color);
-            /* Changed from yellow */
             margin-top: 10px;
             display: flex;
             align-items: center;
@@ -884,7 +881,6 @@
 
         .refresh-btn i {
             color: var(--primary-color);
-            /* Changed from yellow */
         }
 
         /* Spotify Mini Player */
@@ -1256,7 +1252,6 @@
         .card-actions {
             grid-template-columns: 1fr;
         }
-        }
 
         @media (max-width: 420px) {
             .topnav {
@@ -1282,6 +1277,57 @@
             background: rgba(0, 255, 255, 0.2);
             border-radius: 6px;
         }
+
+        /* Typing Dots Animation */
+        .typing {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: wave 1.2s infinite ease-in-out;
+        }
+        .typing:nth-child(2) { animation-delay: 0.2s; }
+        .typing:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        /* Custom fixed positioning for chat fab so it's not intercepted */
+        .fab-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1500;
+        }
+
+        /* Fix chat-modal positioning & z-index */
+        .chat-modal {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 380px;
+            height: 520px;
+            max-width: 90vw;
+            background: rgba(2, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            transform: scale(0);
+            transform-origin: bottom right;
+            transition: 0.3s;
+            z-index: 1600; /* Must be higher than fab-container */
+        }
+        .chat-modal.open {
+            transform: scale(1);
+        }
     </style>
 </head>
 
@@ -1306,16 +1352,6 @@
                             <path d="M50 30 C55 20, 60 15, 65 10" stroke="#00FF88" stroke-width="3" fill="none" />
                             <path d="M30 30 C25 40, 20 45, 15 50" stroke="#00FF88" stroke-width="3" fill="none" />
                             <path d="M50 30 C55 40, 60 45, 65 50" stroke="#00FF88" stroke-width="3" fill="none" />
-                            <circle cx="30" cy="30" r="5" fill="none" stroke="#00FF88" stroke-width="2" opacity="0.0" />
-                            <circle cx="50" cy="30" r="5" fill="none" stroke="#00FF88" stroke-width="2" opacity="0.0" />
-                            <circle cx="15" cy="10" r="3" fill="none" stroke="#00FF88" stroke-width="1.5"
-                                opacity="0.0" />
-                            <circle cx="65" cy="10" r="3" fill="none" stroke="#00FF88" stroke-width="1.5"
-                                opacity="0.0" />
-                            <circle cx="15" cy="50" r="3" fill="none" stroke="#00FF88" stroke-width="1.5"
-                                opacity="0.0" />
-                            <circle cx="65" cy="50" r="3" fill="none" stroke="#00FF88" stroke-width="1.5"
-                                opacity="0.0" />
                         </g>
                     </svg>
                 </div>
@@ -1333,13 +1369,9 @@
                                 const statItem = document.querySelector('.stat-item');
 
                                 if (data && data.username) {
-                                    // ✅ Insert username inside <p id="user-info">
                                     userInfo.innerHTML = `Created by Hayden | ${data.username}`;
-
-                                    // ✅ Update device count
                                     deviceCount.textContent = 'Online';
 
-                                    // ✅ Add logout icon inside stat-item
                                     const logoutBtn = document.createElement('a');
                                     logoutBtn.href = '/logout';
                                     logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
@@ -1360,9 +1392,7 @@
                             } catch (err) {
                                 console.warn('Failed to fetch username:', err);
                                 const userInfo = document.getElementById('user-info');
-                                const deviceCount = document.getElementById('device-count');
                                 if (userInfo) userInfo.innerHTML = 'Created by Hayden | Guest';
-                                if (deviceCount) deviceCount.textContent = 'Offline';
                             }
                         })();
                     </script>
@@ -1376,11 +1406,9 @@
                 <div class="status-dot" aria-hidden="true"></div>
                 <span id="device-counts">Loading...</span>
             </div>
-            <span id="error-message" style="display:none;margin-left:12px;color:#FF6B6B;font-size:13px;"></span>
         </div>
     </nav>
 
-    <!-- Sidebar backdrop (mobile) -->
     <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
     <div class="container">
@@ -1388,7 +1416,7 @@
         <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
             <div class="menu-group">
                 <div class="menu-title">Main</div>
-                <div class="menu-item active" data-href="/crmx"><svg class="menu-icon" fill="none" stroke="currentColor"
+                <div class="menu-item active" data-href="/"><svg class="menu-icon" fill="none" stroke="currentColor"
                         stroke-width="2" viewBox="0 0 24 24">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     </svg><span>Dashboard</span></div>
@@ -1397,7 +1425,7 @@
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg><span>Surveillance</span></div>
-                <div class="menu-item" id="tor-chat" data-href="">
+                <div class="menu-item" id="tor-chat" data-href="/admin">
                     <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <rect x="3" y="3" width="7" height="7" />
                         <rect x="14" y="3" width="7" height="7" />
@@ -1406,16 +1434,12 @@
                     </svg>
                     <span>Admin Pannel</span>
                 </div>
-
-
-
-
                 <div class="menu-item" data-href="/profiles"><svg class="menu-icon" fill="none" stroke="currentColor"
                         stroke-width="2" viewBox="0 0 24 24">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                         <circle cx="9" cy="7" r="4" />
                     </svg><span>Profiles</span></div>
-                <div class="menu-item" data-href="/profiles"><svg class="menu-icon" fill="none" stroke="currentColor"
+                <div class="menu-item" data-href="/tor-chat"><svg class="menu-icon" fill="none" stroke="currentColor"
                         stroke-width="2" viewBox="0 0 24 24">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg><span>Local Tor Chat</span></div>
@@ -1451,13 +1475,13 @@
                         stroke-width="2" viewBox="0 0 24 24">
                         <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                     </svg><span>Alerts</span></div>
-                <div class="menu-item" data-href="fit"><svg class="menu-icon" fill="none" stroke="currentColor"
+                <div class="menu-item" data-href="/fit"><svg class="menu-icon" fill="none" stroke="currentColor"
                         stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
                         <path d="M8 12 L10 14 L16 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                             stroke-linejoin="round" fill="none" />
                     </svg><span>Fit</span></div>
-                <div class="menu-item" data-href="settings"><svg class="menu-icon" fill="none" stroke="currentColor"
+                <div class="menu-item" data-href="/settings"><svg class="menu-icon" fill="none" stroke="currentColor"
                         stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="3" />
                         <path d="M12 1v6m0 6v6m-9-9h6m6 0h6" />
@@ -1475,11 +1499,7 @@
                 </div>
             </center>
 
-
-
-
-
-            <div class="mode-toggle-container">
+            <div class="mode-toggle-container" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
                 <span class="mode-label active" id="label-wifi">WIFI UPLINK</span>
                 <label class="switch">
                     <input type="checkbox" id="mode-switch" onchange="toggleMode()">
@@ -1488,7 +1508,8 @@
                 <span class="mode-label" id="label-bluetooth">BT SCANNERS</span>
             </div>
 
-            <center> <select id="search-type">
+            <center>
+                <select id="search-type">
                     <option value="location">Location</option>
                     <option value="bssid">BSSID</option>
                     <option value="ssid">Wi-Fi SSID</option>
@@ -1535,11 +1556,40 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 15px; margin-bottom: 30px;">
-                <a href="#" class="download-btn" id="download-btn" style="display: none;">Download Intel Report</a>
+            <div style="display: flex; gap: 15px; margin-bottom: 30px; justify-content: center;">
+                <a href="#" class="action-btn" id="download-btn" style="display: none; text-align: center; text-decoration: none; width: 200px;">Download Intel Report</a>
             </div>
             <div class="toast" id="toast">No connections intercepted</div>
+        </main>
     </div>
+
+    <!-- ==== FAB CHAT BUTTON (Moved to body direct child for correct stacking context) ==== -->
+    <div class="fab-container">
+        <button id="chat-fab" class="fab-btn" aria-label="Open AI Chat">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
+    <!-- ==== CHAT MODAL (Moved to body direct child for correct stacking context) ==== -->
+    <div id="chat-modal" class="chat-modal" aria-hidden="true">
+        <div class="chat-header">
+            <span>Hayden's H9-AI Assistant</span>
+            <button id="close-chat" class="chat-close" style="background: transparent; border: none; color: var(--primary-color); font-size: 22px; cursor: pointer;" aria-label="Close">×</button>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="web-search-toggle" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; color: #00FFFF; user-select: none;">
+            <label class="switch" style="width: 34px; height: 18px; position: relative; display: inline-block;">
+                <input type="checkbox" id="web-search-enabled">
+                <span class="slider" style="border-radius: 18px; position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); transition: .4s; border: 1px solid var(--border-color);"></span>
+            </label>
+            <span class="toggle-label" style="font-size: 11px; margin-left: 5px; font-weight: 600;">Web Search</span>
+        </div>
+        <div class="chat-input-area" style="display: flex; border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.3);">
+            <input type="text" id="chat-input" placeholder="Ask me anything…" autocomplete="off" style="flex: 1; padding: 15px; background: transparent; border: none; color: #fff; font-family: var(--font-main);">
+            <button id="chat-send" aria-label="Send" style="background: transparent; border: none; color: var(--primary-color); width: 50px; cursor: pointer; transition: 0.3s;">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Leaflet JS from CDN -->
@@ -1562,28 +1612,18 @@
                 attribution: '© Esri, Maxar, Earthstar Geographics'
             });
 
-            const hybridLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-                attribution: '© Google Maps'
-            });
-
             const baseLayers = {
                 "CyberMap": cyberLayer,
-                "SatView": satelliteLayer,
-                "Hybrid": hybridLayer
+                "SatView": satelliteLayer
             };
 
             L.control.layers(baseLayers).addTo(map);
             cyberLayer.addTo(map);
-            document.getElementById('map').classList.add('cyber-map');
 
             map.on('baselayerchange', (e) => {
                 if (e.name === "SatView") {
-                    document.getElementById('map').classList.remove('cyber-map');
                     document.body.classList.add('sat-mode');
                 } else {
-                    document.getElementById('map').classList.add('cyber-map');
                     document.body.classList.remove('sat-mode');
                 }
             });
@@ -1596,7 +1636,6 @@
             map.addLayer(markers);
         }
 
-        // Toggle Mode logic
         function toggleMode() {
             const isBT = document.getElementById('mode-switch').checked;
             document.getElementById('label-wifi').classList.toggle('active', !isBT);
@@ -1606,13 +1645,11 @@
             showToast(`SENSORS_SWITCHED: ${isBT ? 'BLUETOOTH' : 'WIFI'}`);
         }
 
-        // Fetch nearby devices from Flask backend
         async function fetchNearbyDevices(lat, lon) {
             const mode = document.getElementById('mode-switch').checked ? 'bluetooth' : 'wifi';
             try {
                 const response = await fetch(`/nearby?lat=${lat}&lon=${lon}&mode=${mode}`);
                 const data = await response.json();
-                console.log('Nearby response:', data);
                 if (data.error) {
                     showToast(data.error);
                     return;
@@ -1624,7 +1661,6 @@
             }
         }
 
-        // Perform search based on input
         async function performSearch() {
             const searchType = document.getElementById('search-type').value;
             const searchInput = document.getElementById('search-input').value;
@@ -1637,7 +1673,6 @@
                 const mode = document.getElementById('mode-switch').checked ? 'bluetooth' : 'wifi';
                 const response = await fetch(`/searchzz?type=${searchType}&query=${encodeURIComponent(searchInput)}&mode=${mode}`);
                 const data = await response.json();
-                console.log('Search response:', data);
                 if (data.error) {
                     showToast(data.error);
                     return;
@@ -1649,32 +1684,25 @@
             }
         }
 
-        // Update map with device markers
         let markerMap = {};
 
         function updateMap(data) {
             markers.clearLayers();
             markerMap = {};
             if (data && data.devices) results = data.devices;
-            console.log('Processed results for map:', results);
 
-            // Get active filters
             const activeFilters = Array.from(document.querySelectorAll('.filter-cb:checked')).map(cb => cb.value);
 
-            // Apply filtering
             const filteredResults = results.filter(device => {
                 const type = device.type || 'unknown';
                 if (type === 'router' || type === 'cell_tower' || type === 'iot_device') {
-                    // For WiFi mode, show these if bluetooth isn't the primary focus 
-                    // or if they match generic categories. 
-                    // Actually, simple logic: if it's in the filters, show it.
                     return activeFilters.includes(type) || activeFilters.includes('router');
                 }
                 return activeFilters.includes(type);
             });
 
             if (filteredResults.length === 0) {
-                showToast('No devices found');
+                showToast('No devices found matching active filters');
                 document.getElementById('results-list').innerHTML = `
                     <div style="text-align: center; color: var(--text-dim); padding: 50px 20px;">
                         No Matches Found
@@ -1719,11 +1747,20 @@
             }
         }
 
-        // Add listeners for real-time filtering
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.filter-cb').forEach(cb => {
                 cb.addEventListener('change', () => {
-                    updateMap(); // Re-render with existing 'results'
+                    updateMap();
+                });
+            });
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const label = item.querySelector('span').textContent;
+                    showToast(`MODE: ${label.toUpperCase()} LOADED`);
+
+                    document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
+                    item.classList.add('active');
                 });
             });
         });
@@ -1732,18 +1769,7 @@
             const list = document.getElementById('results-list');
             list.innerHTML = '';
 
-            // Get active filters
-            const activeFilters = Array.from(document.querySelectorAll('.filter-cb:checked')).map(cb => cb.value);
-
-            const filteredNodes = nodes.filter(node => {
-                const type = node.type || 'unknown';
-                if (type === 'router' || type === 'cell_tower' || type === 'iot_device') {
-                    return activeFilters.includes(type) || activeFilters.includes('router');
-                }
-                return activeFilters.includes(type);
-            });
-
-            filteredNodes.forEach((node) => {
+            nodes.forEach((node) => {
                 const signal = node.signal ? Math.min(Math.abs(node.signal), 100) : 50;
                 const percent = 100 - (signal > 100 ? 100 : signal);
                 const lastSeen = node.timestamp ? formatRelativeTime(node.timestamp) : 'LIVE';
@@ -1751,7 +1777,6 @@
                 const item = document.createElement('div');
                 item.className = 'node-item';
                 item.onclick = () => {
-                    // find marker by coordinates as we might have filtered
                     const marker = markers.getLayers().find(m => m.getLatLng().lat === node.lat && m.getLatLng().lng === node.lon);
                     if (marker) {
                         map.setView(marker.getLatLng(), 17);
@@ -1761,7 +1786,7 @@
 
                 item.innerHTML = `
                     <div class="node-header">
-                        <span class="node-name">${node.ssid || node.ip || 'Unknown'}</span>
+                        <span class="node-name">${node.ssid || node.ip || node.cell_id || 'Unknown'}</span>
                         ${node.leaked ? `<span class="node-type" style="color: #FF4444; font-weight: bold;">WPA-SEC LEAKED</span>` : ``}
                         <span class="node-type" style="background: ${getCategoryColor(node.type)}44; color: ${getCategoryColor(node.type)};">${node.type || 'node'}</span>
                     </div>
@@ -1802,7 +1827,6 @@
             return colors[type] || 'var(--primary-color)';
         }
 
-        // Get icon based on device type
         function getDeviceIcon(type, leaked) {
             const icons = {
                 router: 'fas fa-wifi',
@@ -1821,9 +1845,9 @@
 
             let color = 'var(--primary-color)';
             if (type === 'bluetooth') color = '#4A90E2';
-            if (type === 'car') color = '#FFD700'; // Gold for transport
-            if (type === 'camera' || type === 'dashcam') color = '#FF4444'; // Red for surveillance
-            if (type === 'tv' || type === 'headphone') color = '#00FF88'; // Green for entertainment
+            if (type === 'car') color = '#FFD700';
+            if (type === 'camera' || type === 'dashcam') color = '#FF4444';
+            if (type === 'tv' || type === 'headphone') color = '#00FF88';
 
             if (leaked) color = '#FF4444';
 
@@ -1835,7 +1859,6 @@
             });
         }
 
-        // Setup download button
         function setupDownload() {
             const btn = document.getElementById('download-btn');
             const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
@@ -1843,7 +1866,6 @@
             btn.download = 'wifi-search-results.json';
         }
 
-        // Show toast notification
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1853,220 +1875,15 @@
             }, 3000);
         }
 
-        // Dummy content loader for sidebar (placeholder)
-        function loadContent(page) {
-            console.log(`Loading ${page}`);
-        }
-
-        // Initialize map on load
         window.onload = initMap;
     </script>
 
-    <!-- ==== ADD THIS RIGHT BEFORE </body> (still inside <body>) ==== -->
-    <div class="fab-container">
-        <button id="chat-fab" class="fab-btn" aria-label="Open AI Chat">
-            <i class="fas fa-comment-dots"></i>
-        </button>
-    </div>
-    <!-- ==== END FAB ==== -->
-    <!-- ==== ADD THIS RIGHT AFTER the FAB (still before </body>) ==== -->
-    <div id="chat-modal" class="chat-modal" aria-hidden="true">
-        <div class="chat-header">
-            <span>Hayden's H9-AI Assistant</span>
-            <button id="close-chat" class="chat-close" aria-label="Close">×</button>
-        </div>
-        <div id="chat-messages" class="chat-messages"></div>
-        <!-- ADD THIS BEFORE <div class="chat-input-area"> -->
-        <div class="web-search-toggle">
-            <label>
-                <input type="checkbox" id="web-search-enabled">
-                <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Web Search</span>
-        </div>
-        <!-- END ADD -->
-        <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Ask me anything…" autocomplete="off">
-            <button id="chat-send" aria-label="Send">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-    <!-- ==== END CHAT MODAL ==== -->
-    <style>
-        .web-search-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            font-size: 12px;
-            color: #00FFFF;
-            user-select: none;
-        }
+    <!-- ==== SYNTAX HIGHLIGHTING & MARKDOWN ==== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-        .web-search-toggle input {
-            display: none;
-        }
-
-        .toggle-slider {
-            position: relative;
-            width: 34px;
-            height: 18px;
-            background: rgba(0, 255, 255, 0.2);
-            border: 1px solid #00FFFF;
-            border-radius: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .toggle-slider::after {
-            content: '';
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            background: #00FFFF;
-            border-radius: 50%;
-            top: 1px;
-            left: 1px;
-            transition: 0.3s;
-        }
-
-        #web-search-enabled:checked+.toggle-slider {
-            background: #00FFFF;
-        }
-
-        #web-search-enabled:checked+.toggle-slider::after {
-            background: #0A1F1F;
-            transform: translateX(16px);
-        }
-
-        .toggle-label {
-            font-weight: 600;
-        }
-
-        /* ==== CHAT POPUP STYLES ==== */
-        .chat-modal {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            width: 380px;
-            height: 520px;
-            max-width: 90vw;
-            background: rgba(2, 10, 10, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            transform: scale(0);
-            transform-origin: bottom right;
-            transition: 0.3s;
-            z-index: 1300;
-        }
-
-        .chat-modal.open {
-            transform: scale(1);
-        }
-
-        .chat-header {
-            background: rgba(0, 255, 209, 0.1);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--primary-color);
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 2px;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            max-width: 85%;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: rgba(0, 255, 209, 0.15);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background: rgba(0, 163, 255, 0.1);
-            border: 1px solid var(--secondary-color);
-            color: var(--secondary-color);
-        }
-
-        .chat-input-area {
-            display: flex;
-            border-top: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        #chat-input {
-            flex: 1;
-            padding: 15px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: var(--font-main);
-        }
-
-        #chat-input:focus {
-            outline: none;
-        }
-
-        #chat-send {
-            background: transparent;
-            border: none;
-            color: var(--primary-color);
-            width: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        #chat-send:hover {
-            transform: scale(1.2);
-            text-shadow: var(--neon-glow);
-        }
-
-        .fab-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--bg-dark);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: var(--neon-glow);
-            transition: 0.3s;
-        }
-
-        .fab-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 0 25px var(--primary-color);
-        }
-    </style>
     <script>
-        /* ==== CHAT POPUP LOGIC ==== */
         const fabBtn = document.getElementById('chat-fab');
         const modal = document.getElementById('chat-modal');
         const closeBtn = document.getElementById('close-chat');
@@ -2078,21 +1895,24 @@
         function closeChat() { modal.classList.remove('open'); input.value = ''; }
         fabBtn.addEventListener('click', openChat);
         closeBtn.addEventListener('click', closeChat);
-        modal.addEventListener('click', e => { if (e.target === modal) closeChat(); });
 
         function addMessage(text, type) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
+
             if (type === 'bot' && text === 'typing') {
                 div.innerHTML = `<span class="typing"></span><span class="typing"></span><span class="typing"></span>`;
+            } else if (type === 'bot') {
+                div.innerHTML = marked.parse(text);
             } else {
                 div.textContent = text;
             }
             messages.appendChild(div);
             messages.scrollTop = messages.scrollHeight;
+
+            div.querySelectorAll('pre code').forEach(hljs.highlightElement);
         }
 
-        /* ==== SEND MESSAGE → CALL YOUR FLASK ENDPOINT ==== */
         async function sendMessage() {
             const userText = input.value.trim();
             if (!userText) return;
@@ -2100,60 +1920,35 @@
             addMessage(userText, 'user');
             input.value = '';
 
-            // Show typing
             addMessage('typing', 'bot');
-
-            // Get web search state
-            const webSearchEnabled = document.getElementById('web-search-enabled').checked;
 
             try {
                 const res = await fetch('/chatgpt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: userText,
-                        web_search: webSearchEnabled  // NEW: send flag
-                    })
+                    body: JSON.stringify({ message: userText })
                 });
                 const data = await res.json();
 
-                messages.lastElementChild.remove(); // remove typing
+                const typingMsg = messages.querySelector('.message.bot .typing');
+                if (typingMsg) {
+                    typingMsg.parentElement.remove();
+                }
+
                 addMessage(data.reply, 'bot');
             } catch (err) {
-                messages.lastElementChild.remove();
-                addMessage('Error – try again', 'bot');
+                const typingMsg = messages.querySelector('.message.bot .typing');
+                if (typingMsg) {
+                    typingMsg.parentElement.remove();
+                }
+                addMessage('Error - check connection and try again', 'bot');
                 console.error(err);
             }
         }
 
         sendBtn.addEventListener('click', sendMessage);
         input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-
-        /* optional: close with ESC */
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeChat(); });
-    </script>
-    <!-- ==== SYNTAX HIGHLIGHTING ==== -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('pre code').forEach(hljs.highlightElement);
-        });
-    </script>
-    <!-- ==== END HIGHLIGHT ==== -->
-    <script>
-        function addMessage(text, type) {
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.innerHTML = text;  // Now supports HTML <pre><code>
-
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
-
-            // Re-highlight new code blocks
-            div.querySelectorAll('pre code').forEach(hljs.highlightElement);
-        }
     </script>
 </body>
 
