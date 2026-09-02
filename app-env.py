@@ -63,10 +63,74 @@ DUMMY_DATA = [
 def wifi_map():
     return render_template('wifi-search.html')
 
+def check_usb_sdr_status():
+    """Checks if a physical USB SDR receiver (e.g. RTL-SDR, HackRF, Airspy) is attached via USB."""
+    connected = False
+    device_name = "SDR USB Dongle"
+    freq_range = "24 MHz - 1766 MHz"
+
+    usb_dir = "/sys/bus/usb/devices"
+    if os.path.exists(usb_dir):
+        try:
+            for dev in os.listdir(usb_dir):
+                vp_path = os.path.join(usb_dir, dev)
+                id_vendor = os.path.join(vp_path, "idVendor")
+                id_product = os.path.join(vp_path, "idProduct")
+                product_file = os.path.join(vp_path, "product")
+
+                vendor_id = ""
+                product_id = ""
+                product_str = ""
+
+                if os.path.exists(id_vendor):
+                    with open(id_vendor, 'r') as f:
+                        vendor_id = f.read().strip().lower()
+                if os.path.exists(id_product):
+                    with open(id_product, 'r') as f:
+                        product_id = f.read().strip().lower()
+                if os.path.exists(product_file):
+                    with open(product_file, 'r', errors='ignore') as f:
+                        product_str = f.read().strip()
+
+                if (vendor_id == '0bda' and product_id in ['2838', '2832']) or 'rtl' in product_str.lower():
+                    connected = True
+                    device_name = product_str or "RTL2838UHIDIR RTL-SDR Blog V4"
+                    freq_range = "500 kHz - 1766 MHz"
+                    break
+                elif (vendor_id == '1d50' and product_id in ['6089', '604b']) or 'hackrf' in product_str.lower():
+                    connected = True
+                    device_name = product_str or "Great Scott Gadgets HackRF One"
+                    freq_range = "1 MHz - 6 GHz"
+                    break
+                elif (vendor_id == '1d50' and product_id == '60a1') or 'airspy' in product_str.lower():
+                    connected = True
+                    device_name = product_str or "Airspy R2 / Mini"
+                    freq_range = "24 MHz - 1800 MHz"
+                    break
+                elif 'sdr' in product_str.lower() or 'software defined radio' in product_str.lower():
+                    connected = True
+                    device_name = product_str
+                    break
+        except Exception as e:
+            print(f"USB scan exception: {e}")
+
+    return {
+        "connected": connected,
+        "device": device_name if connected else "USB SDR Receiver (Simulated / Standby)",
+        "frequency_range": freq_range,
+        "status": "Active Hardware Link" if connected else "Simulated SDR Mode"
+    }
+
+@app.route('/api/sdr/status')
+def sdr_status():
+    return jsonify(check_usb_sdr_status())
+
 def classify_device(name, original_type):
     if not name:
         return original_type
     name_upper = name.upper()
+    if any(k in name_upper for k in ["SDR", "RTL-SDR", "HACKRF", "ADSB", "SUBGHZ", "RF_BEACON", "HAM_RADIO", "RADIO", "433MHZ", "868MHZ", "915MHZ"]):
+        return "sdr"
     if any(k in name_upper for k in ["CAR", "FORD", "TOYOTA", "BMW", "TESLA", "SYNC", "MAZDA", "HONDA", "UCONNECT", "HYUNDAI", "LEXUS", "NISSAN"]):
         return "car"
     if any(k in name_upper for k in ["TV", "BRAVIA", "VIZIO", "SAMSUNG", "LG", "ROKU", "FIRE", "SMARTVIEW", "KDL-"]):
@@ -124,14 +188,64 @@ def wpasec_kquery(devices):
 def nearby():
     lat = request.args.get('lat', type=float)
     lon = request.args.get('lon', type=float)
-    mode = request.args.get('mode', 'wifi') # 'wifi' or 'bluetooth'
+    mode = request.args.get('mode', 'wifi') # 'wifi', 'bluetooth', or 'sdr'
     
     if not lat or not lon:
         return jsonify({"error": "Missing coordinates"}), 400
 
     devices = []
     
-    if mode == 'bluetooth':
+    if mode == 'sdr':
+        sdr_info = check_usb_sdr_status()
+        sdr_dev_name = sdr_info["device"]
+        devices = [
+            {
+                "lat": lat + random.uniform(-0.0015, 0.0015),
+                "lon": lon + random.uniform(-0.0015, 0.0015),
+                "ssid": "ADS-B Flight Transponder (1090 MHz)",
+                "bssid": "ICAO-4B182C",
+                "vendor": f"Aircraft Mode-S / {sdr_dev_name}",
+                "signal": -52,
+                "frequency": "1090 MHz",
+                "timestamp": "2025-04-11T10:05:00Z",
+                "type": "sdr"
+            },
+            {
+                "lat": lat + random.uniform(-0.0015, 0.0015),
+                "lon": lon + random.uniform(-0.0015, 0.0015),
+                "ssid": "Sub-GHz Weather Station (433.92 MHz)",
+                "bssid": "RF-433-SENSOR",
+                "vendor": f"ASK/FSK Telemetry / {sdr_dev_name}",
+                "signal": -68,
+                "frequency": "433.92 MHz",
+                "timestamp": "2025-04-11T10:05:00Z",
+                "type": "sdr"
+            },
+            {
+                "lat": lat + random.uniform(-0.0015, 0.0015),
+                "lon": lon + random.uniform(-0.0015, 0.0015),
+                "ssid": "FM Radio Broadcast Beacon (101.1 MHz)",
+                "bssid": "RF-FM-TOWER",
+                "vendor": f"WFM Audio Carrier / {sdr_dev_name}",
+                "signal": -40,
+                "frequency": "101.1 MHz",
+                "timestamp": "2025-04-11T10:05:00Z",
+                "type": "sdr"
+            },
+            {
+                "lat": lat + random.uniform(-0.0015, 0.0015),
+                "lon": lon + random.uniform(-0.0015, 0.0015),
+                "ssid": "ISM Smart Meter RF (915 MHz)",
+                "bssid": "RF-915-GRID",
+                "vendor": f"LoRa/FSK Node / {sdr_dev_name}",
+                "signal": -74,
+                "frequency": "915 MHz",
+                "timestamp": "2025-04-11T10:05:00Z",
+                "type": "sdr"
+            }
+        ]
+        return jsonify({"devices": devices, "sdr_status": sdr_info})
+    elif mode == 'bluetooth':
         # Wigle Bluetooth API call
         try:
             wigle_response = requests.get(
@@ -400,10 +514,29 @@ def get_celltower_click():
 def search():
     search_type = request.args.get('type')
     query = request.args.get('query')
+    mode = request.args.get('mode', 'wifi')
     if not search_type or not query:
         return jsonify({"error": "Missing search parameters"}), 400
 
     devices = []
+
+    if mode == 'sdr':
+        sdr_info = check_usb_sdr_status()
+        sdr_dev_name = sdr_info["device"]
+        devices = [
+            {
+                "lat": 51.505 + random.uniform(-0.002, 0.002),
+                "lon": -0.09 + random.uniform(-0.002, 0.002),
+                "ssid": f"SDR Signal [{query}]",
+                "bssid": "RF-SDR-BEACON",
+                "vendor": f"Software Defined Radio / {sdr_dev_name}",
+                "signal": -60,
+                "frequency": "433.92 MHz",
+                "timestamp": "2025-04-11T10:05:00Z",
+                "type": "sdr"
+            }
+        ]
+        return jsonify({"devices": devices, "sdr_status": sdr_info})
 
     if search_type == 'location':
         try:

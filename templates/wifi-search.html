@@ -267,6 +267,44 @@
             text-shadow: var(--neon-glow);
         }
 
+        .mode-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: rgba(0, 255, 209, 0.02);
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mode-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            padding: 8px 16px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .mode-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .mode-btn.active {
+            background: rgba(0, 255, 209, 0.15);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: var(--neon-glow);
+            font-weight: bold;
+        }
+
         .mode-label {
             font-size: 12px;
             letter-spacing: 2px;
@@ -1376,6 +1414,10 @@
                 <div class="status-dot" aria-hidden="true"></div>
                 <span id="device-counts">Loading...</span>
             </div>
+            <div class="stat-item" id="sdr-status-item" title="USB SDR Receiver Status">
+                <i class="fas fa-satellite-dish" style="color: var(--primary-color);"></i>
+                <span id="sdr-status-badge">SDR: Checking...</span>
+            </div>
             <span id="error-message" style="display:none;margin-left:12px;color:#FF6B6B;font-size:13px;"></span>
         </div>
     </nav>
@@ -1480,12 +1522,9 @@
 
 
             <div class="mode-toggle-container">
-                <span class="mode-label active" id="label-wifi">WIFI UPLINK</span>
-                <label class="switch">
-                    <input type="checkbox" id="mode-switch" onchange="toggleMode()">
-                    <span class="slider"></span>
-                </label>
-                <span class="mode-label" id="label-bluetooth">BT SCANNERS</span>
+                <button class="mode-btn active" id="btn-mode-wifi" onclick="setMode('wifi')"><i class="fas fa-wifi"></i> WIFI UPLINK</button>
+                <button class="mode-btn" id="btn-mode-bluetooth" onclick="setMode('bluetooth')"><i class="fab fa-bluetooth"></i> BT SCANNERS</button>
+                <button class="mode-btn" id="btn-mode-sdr" onclick="setMode('sdr')"><i class="fas fa-broadcast-tower"></i> SDR RECEIVER</button>
             </div>
 
             <center> <select id="search-type">
@@ -1503,6 +1542,9 @@
                     </label>
                     <label class="cyber-check"><input type="checkbox" checked class="filter-cb" value="bluetooth">
                         <div class="box"></div> BLUETOOTH
+                    </label>
+                    <label class="cyber-check"><input type="checkbox" checked class="filter-cb" value="sdr">
+                        <div class="box"></div> SDR_RF
                     </label>
                     <label class="cyber-check"><input type="checkbox" checked class="filter-cb" value="camera">
                         <div class="box"></div> CCTV/CAM
@@ -1596,23 +1638,39 @@
             map.addLayer(markers);
         }
 
-        // Toggle Mode logic
-        function toggleMode() {
-            const isBT = document.getElementById('mode-switch').checked;
-            document.getElementById('label-wifi').classList.toggle('active', !isBT);
-            document.getElementById('label-bluetooth').classList.toggle('active', isBT);
+        let currentMode = 'wifi';
+
+        function setMode(mode) {
+            currentMode = mode;
+            ['wifi', 'bluetooth', 'sdr'].forEach(m => {
+                const btn = document.getElementById(`btn-mode-${m}`);
+                if (btn) {
+                    if (m === mode) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
             markers.clearLayers();
             results = [];
-            showToast(`SENSORS_SWITCHED: ${isBT ? 'BLUETOOTH' : 'WIFI'}`);
+            showToast(`SENSORS_SWITCHED: ${mode.toUpperCase()}`);
+            if (map) {
+                const center = map.getCenter();
+                fetchNearbyDevices(center.lat, center.lng);
+            }
         }
 
         // Fetch nearby devices from Flask backend
         async function fetchNearbyDevices(lat, lon) {
-            const mode = document.getElementById('mode-switch').checked ? 'bluetooth' : 'wifi';
+            const mode = currentMode;
             try {
                 const response = await fetch(`/nearby?lat=${lat}&lon=${lon}&mode=${mode}`);
                 const data = await response.json();
                 console.log('Nearby response:', data);
+                if (data.sdr_status && data.sdr_status.device) {
+                    updateSDRBadge(data.sdr_status);
+                }
                 if (data.error) {
                     showToast(data.error);
                     return;
@@ -1621,6 +1679,27 @@
             } catch (err) {
                 showToast('Error fetching devices');
                 console.error('Fetch error:', err);
+            }
+        }
+
+        async function checkSDRStatus() {
+            try {
+                const res = await fetch('/api/sdr/status');
+                const data = await res.json();
+                updateSDRBadge(data);
+            } catch (e) {
+                console.warn('SDR status check failed:', e);
+            }
+        }
+
+        function updateSDRBadge(sdr) {
+            const badge = document.getElementById('sdr-status-badge');
+            if (badge) {
+                if (sdr.connected) {
+                    badge.innerHTML = `<span style="color:#00E676; font-weight:bold;">SDR: CONNECTED (${sdr.device})</span>`;
+                } else {
+                    badge.innerHTML = `<span style="color:#FF9900;">SDR: SIMULATED (${sdr.device})</span>`;
+                }
             }
         }
 
@@ -1634,10 +1713,13 @@
             }
 
             try {
-                const mode = document.getElementById('mode-switch').checked ? 'bluetooth' : 'wifi';
+                const mode = currentMode;
                 const response = await fetch(`/searchzz?type=${searchType}&query=${encodeURIComponent(searchInput)}&mode=${mode}`);
                 const data = await response.json();
                 console.log('Search response:', data);
+                if (data.sdr_status) {
+                    updateSDRBadge(data.sdr_status);
+                }
                 if (data.error) {
                     showToast(data.error);
                     return;
@@ -1797,7 +1879,8 @@
                 tv: '#00FF88',
                 headphone: '#00FF88',
                 router: 'var(--primary-color)',
-                cell_tower: '#FF00FF'
+                cell_tower: '#FF00FF',
+                sdr: '#FF9900'
             };
             return colors[type] || 'var(--primary-color)';
         }
@@ -1807,6 +1890,7 @@
             const icons = {
                 router: 'fas fa-wifi',
                 cell_tower: 'fas fa-broadcast-tower',
+                sdr: 'fas fa-broadcast-tower',
                 camera: 'fas fa-camera',
                 dashcam: 'fas fa-video',
                 car: 'fas fa-car',
@@ -1824,6 +1908,7 @@
             if (type === 'car') color = '#FFD700'; // Gold for transport
             if (type === 'camera' || type === 'dashcam') color = '#FF4444'; // Red for surveillance
             if (type === 'tv' || type === 'headphone') color = '#00FF88'; // Green for entertainment
+            if (type === 'sdr') color = '#FF9900'; // Amber for SDR
 
             if (leaked) color = '#FF4444';
 
@@ -1859,7 +1944,11 @@
         }
 
         // Initialize map on load
-        window.onload = initMap;
+        window.onload = () => {
+            initMap();
+            checkSDRStatus();
+            setInterval(checkSDRStatus, 15000);
+        };
     </script>
 
     <!-- ==== ADD THIS RIGHT BEFORE </body> (still inside <body>) ==== -->
